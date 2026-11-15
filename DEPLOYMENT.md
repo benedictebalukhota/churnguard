@@ -97,3 +97,21 @@ Review new metadata and evaluation results before replacing the saved model. Kee
 - Test campaign lift against a holdout group before claiming saved revenue or reduced churn.
 - Review fairness, privacy, subgroup errors, monitoring, retention policy and access controls.
 - Avoid entering identifiable or confidential customer information into a public demo.
+
+## F. Automatically sync GitHub to Hugging Face (recommended)
+
+The repository includes `.github/workflows/sync-to-huggingface.yml`. This uses the official `huggingface/hub-sync` GitHub Action. When a commit is pushed to GitHub's `main` branch, GitHub Actions mirrors the repository files to your Hugging Face Space. Hugging Face then rebuilds the Space after the update.
+
+1. Create your GitHub repository and upload/commit the complete project files to its `main` branch.
+2. Create the target Hugging Face Space first. Choose **Gradio** as the SDK and name it `churnguard` (or update the workflow to match the Space name you choose).
+3. In Hugging Face, create an access token with **write** permission for that Space. Prefer a fine-grained token scoped only to this target Space.
+4. In GitHub, open the repository and go to **Settings → Secrets and variables → Actions → New repository secret**.
+5. Set the secret name to `HF_TOKEN` and paste the Hugging Face token as its value. Save it. Never put the token in a source file, README, notebook, or commit.
+6. Edit `.github/workflows/sync-to-huggingface.yml` and replace `YOUR_HF_USERNAME` in `huggingface_repo_id` with your real Hugging Face username. Keep the Space name after the slash exactly the same as the Space you created. Commit this edit to `main`.
+7. Open the GitHub **Actions** tab and inspect the “Sync ChurnGuard to Hugging Face” run. When it succeeds, open the Hugging Face Space and check its **Build logs** and **App** tab.
+
+After setup, future pushes to `main` trigger a sync automatically. You can also run the workflow manually from the Actions tab using **Run workflow**.
+
+**Important behaviour:** `huggingface/hub-sync` mirrors the repository's files; it is not a two-way sync or a Git-to-Git remote. GitHub should remain the source of truth. The action also mirrors file deletions, so deleting a file from GitHub can delete it from the Space. Do not independently edit the same application files on Hugging Face, because the next sync can overwrite those changes.
+
+If a build fails, check the GitHub Actions log first, then the Space's Build logs. Typical causes are an incorrect `huggingface_repo_id`, a missing/expired token, a token without write permission, or a missing dependency in `requirements.txt`.

@@ -47,11 +47,9 @@ Open the local Gradio URL printed in the terminal.
 
 ## Deploy to Hugging Face Spaces
 
-1. Create a new **Gradio Space** on Hugging Face.
-2. Upload or push the contents of this repository to the Space repository.
-3. The Space reads its SDK, Python and app entry-point settings from the YAML block at the top of this README.
-4. Wait for the build to finish, then open the App tab and run a sample account.
-5. Use **Use via API** in the Space footer to inspect generated endpoint documentation.
+Recommended: keep GitHub as the source of truth and use the included GitHub Actions workflow to sync changes to your Gradio Space. Follow `DEPLOYMENT.md` section F: create a Gradio Space, create a fine-grained Hugging Face write token, add it to GitHub as the `HF_TOKEN` Actions secret, and replace `YOUR_HF_USERNAME` in `.github/workflows/sync-to-huggingface.yml`. Each push to `main` then syncs the files to the Space and triggers a rebuild.
+
+For a one-time/manual deployment, create a new **Gradio Space** on Hugging Face and push or upload the repository contents to it. The Space reads its SDK, Python and app entry-point settings from the YAML block at the top of this README. After the build finishes, open the App tab and test a sample account. Use **Use via API** in the Space footer to inspect endpoint documentation.
 
 The required Hugging Face Space files are `README.md`, `app.py`, `requirements.txt`, and `artifacts/churnguard_pipeline.joblib` plus its metadata.
 
