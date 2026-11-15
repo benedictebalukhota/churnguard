@@ -1,0 +1,83 @@
+{
+  "model_name": "ChurnGuard LightGBM",
+  "model_version": "1.0.0",
+  "business_domain": "E-commerce account churn",
+  "prediction_unit": "account",
+  "target": {
+    "field": "Churn",
+    "positive_class": 1,
+    "negative_class": 0
+  },
+  "risk_score": "predict_proba[:, 1], bounded from 0.0 to 1.0; treat as a ranking score until separately calibrated",
+  "default_threshold": 0.275,
+  "threshold_source": "Milestone 2 training out-of-fold F2 optimization",
+  "feature_columns": [
+    "Tenure",
+    "City_Tier",
+    "CC_Contacted_L12m",
+    "Payment",
+    "Gender",
+    "Service_Score",
+    "Account_user_count",
+    "account_segment",
+    "CC_Agent_Score",
+    "Marital_Status",
+    "rev_per_month",
+    "Complain_l12m",
+    "rev_growth_yoy",
+    "coupon_used_l12m",
+    "Day_Since_CC_connect",
+    "cashback_l12m",
+    "Login_device"
+  ],
+  "numeric_columns": [
+    "Tenure",
+    "City_Tier",
+    "CC_Contacted_L12m",
+    "Service_Score",
+    "Account_user_count",
+    "CC_Agent_Score",
+    "rev_per_month",
+    "Complain_l12m",
+    "rev_growth_yoy",
+    "coupon_used_l12m",
+    "Day_Since_CC_connect",
+    "cashback_l12m"
+  ],
+  "categorical_columns": [
+    "Payment",
+    "Gender",
+    "account_segment",
+    "Marital_Status",
+    "Login_device"
+  ],
+  "training_parameters": {
+    "objective": "binary",
+    "class_weight": "balanced",
+    "random_state": 42,
+    "verbosity": -1,
+    "n_jobs": 2,
+    "deterministic": true,
+    "force_col_wise": true,
+    "reg_lambda": 1,
+    "num_leaves": 47,
+    "n_estimators": 500,
+    "min_child_samples": 70,
+    "max_depth": -1,
+    "learning_rate": 0.08,
+    "colsample_bytree": 1.0
+  },
+  "training_split": "Stratified 80/20; random_state=42; model fitted on training partition only",
+  "milestone_2_reference_metrics": {
+    "cross_validation_average_precision_mean": 0.9718,
+    "cross_validation_average_precision_std": 0.0091,
+    "holdout_average_precision": 0.9869,
+    "holdout_roc_auc": 0.997
+  },
+  "limitations": [
+    "The workbook has no extraction timestamp or explicit churn prediction horizon.",
+    "Point-in-time leakage has not been ruled out; temporal validation is required before production.",
+    "The tenure unit and the currency/units of revenue and cashback are undocumented.",
+    "The score is not certified as a calibrated probability."
+  ]
+}

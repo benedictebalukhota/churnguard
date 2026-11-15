@@ -1,0 +1,19 @@
+{
+  "Tenure": 0,
+  "City_Tier": 1,
+  "CC_Contacted_L12m": 30,
+  "Payment": "Debit Card",
+  "Gender": "Male",
+  "Service_Score": 2,
+  "Account_user_count": 4,
+  "account_segment": "Regular Plus",
+  "CC_Agent_Score": 3,
+  "Marital_Status": "Single",
+  "rev_per_month": 6,
+  "Complain_l12m": 1,
+  "rev_growth_yoy": 14,
+  "coupon_used_l12m": 0,
+  "Day_Since_CC_connect": 3,
+  "cashback_l12m": 134.07,
+  "Login_device": "Mobile"
+}

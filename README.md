@@ -18,6 +18,8 @@ ChurnGuard is a Gradio application that scores an e-commerce account for churn r
 **Output:** a model risk score between `0.0` and `1.0`, plus an alert based on a configurable threshold.  
 **Default alert threshold:** `0.275`, selected by maximizing F2 on training out-of-fold predictions in Milestone 2.
 
+> **Repository setup status:** the source code, metadata, tests, examples and deployment workflow are present. The fitted model binary, `artifacts/churnguard_pipeline.joblib`, has **not yet been added** to this repository. The application will not start until that exact file is uploaded into `artifacts/`. See `artifacts/README.md` and `DEPLOYMENT.md`.
+
 > **Important interpretation:** the displayed score is the model's positive-class score and is useful for ranking accounts. It is not guaranteed to be a calibrated individual churn probability. The source dataset has no extraction timestamp or explicit prediction horizon; point-in-time leakage has not been ruled out. Treat this as a prototype / controlled-pilot tool, not a production decision system.
 
 ## App preview
@@ -34,7 +36,7 @@ The operating threshold controls the alert decision; it does not change the unde
 
 ## Run locally
 
-Python 3.13 is recommended to match the model artifact build environment. Clone the repository and run:
+Python 3.13 is recommended to match the model artifact build environment. After adding the fitted model file to `artifacts/`, clone the repository and run:
 
 ```bash
 python -m venv .venv
@@ -47,45 +49,60 @@ Open the local Gradio URL printed in the terminal.
 
 ## Deploy to Hugging Face Spaces
 
-Recommended: keep GitHub as the source of truth and use the included GitHub Actions workflow to sync changes to your Gradio Space. Follow `DEPLOYMENT.md` section F: create a Gradio Space, create a fine-grained Hugging Face write token, add it to GitHub as the `HF_TOKEN` Actions secret, and replace `YOUR_HF_USERNAME` in `.github/workflows/sync-to-huggingface.yml`. Each push to `main` then syncs the files to the Space and triggers a rebuild.
+The recommended deployment keeps GitHub as the source of truth and uses the GitHub Actions workflow at `.github/workflows/sync-to-huggingface.yml`.
 
-For a one-time/manual deployment, create a new **Gradio Space** on Hugging Face and push or upload the repository contents to it. The Space reads its SDK, Python and app entry-point settings from the YAML block at the top of this README. After the build finishes, open the App tab and test a sample account. Use **Use via API** in the Space footer to inspect endpoint documentation.
+Before enabling the workflow:
 
-The required Hugging Face Space files are `README.md`, `app.py`, `requirements.txt`, and `artifacts/churnguard_pipeline.joblib` plus its metadata.
+1. Create a Gradio Space.
+2. Add the GitHub Actions repository secret `HF_TOKEN` with a Hugging Face write token scoped to that Space.
+3. Add the GitHub Actions repository variable `HF_REPO_ID` with the exact Hugging Face repository ID, for example `your-hf-username/churnguard`.
+4. Upload the fitted `artifacts/churnguard_pipeline.joblib` file to this GitHub repository.
+5. Push to `main`; GitHub Actions will mirror the files to the Space and Hugging Face will rebuild it.
 
-## GitHub repository layout
+The workflow intentionally skips deployment while the fitted model file is absent. See `DEPLOYMENT.md` for the full steps.
+
+For a one-time/manual deployment, create a Gradio Space and push or upload the complete repository contents after the model file has been added. The Space reads its SDK, Python and app entry-point settings from the YAML block at the top of this README.
+
+## Repository layout
 
 ```text
 churnguard/
+├── .github/workflows/
+│   ├── sync-to-huggingface.yml
+│   └── tests.yml
+├── artifacts/
+│   ├── README.md
+│   ├── metadata.json
+│   └── churnguard_pipeline.joblib   # still needs to be uploaded
+├── assets/
+│   └── README.md
+├── examples/
+│   ├── README.md
+│   └── sample_account.json
+├── tests/
+│   ├── README.md
+│   └── test_app.py
 ├── app.py
 ├── train_model.py
+├── client_example.py
 ├── requirements.txt
 ├── requirements-train.txt
 ├── README.md
-├── LICENSE
-├── .gitignore
-├── artifacts/
-│   ├── churnguard_pipeline.joblib
-│   └── metadata.json
-├── assets/
-│   ├── model_comparison.png
-│   ├── precision_recall_curve.png
-│   └── feature_importance.png
-├── tests/
-│   └── test_app.py
-└── .github/workflows/tests.yml
+├── DEPLOYMENT.md
+├── MODEL_CARD.md
+└── LICENSE
 ```
 
 ## Retrain the model
 
-The original customer workbook is intentionally **not** committed to GitHub. To reproduce the saved artifact locally, obtain the authorized `Customer Churn Data.xlsx` file and run:
+The original customer workbook is intentionally **not** committed to GitHub. To reproduce the saved artifact locally, obtain the authorized `Customer Churn Data.xlsx` file, place it beside `train_model.py`, and run:
 
 ```bash
 pip install -r requirements-train.txt
 python train_model.py --data "Customer Churn Data.xlsx" --output artifacts
 ```
 
-This script reproduces the Milestone 2 cleaning rules, stratified 80/20 split, feature pipeline and selected LightGBM hyperparameters. The saved estimator is trained on the 80% training partition so its evaluation setup matches the milestone. It writes `artifacts/churnguard_pipeline.joblib` and `artifacts/metadata.json`.
+Review the new metadata and evaluation results before replacing the saved model. The script writes `artifacts/churnguard_pipeline.joblib` and `artifacts/metadata.json`. Upload only the fitted model artifact and metadata; do not upload the raw Excel workbook or customer-level records.
 
 ## Model summary
 
