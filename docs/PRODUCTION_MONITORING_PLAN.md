@@ -74,4 +74,4 @@ Do not automatically retrain on a drift alert. Confirm the cause, rebuild a date
 
 ## Current status
 
-The current workbook cannot pass the temporal-validation gate because it has no snapshot dates, feature observation timestamps, or explicit prediction horizon. The deployed model remains a prototype pending those inputs and the reviews above.
+The proposed evaluation horizon is 30 days. The current workbook cannot pass the temporal-validation gate because it has no snapshot dates, feature observation timestamps, or 30-day outcome labels. `validate_temporal_data.py` and `evaluate_temporal.py` are ready for a properly prepared dated dataset, but no future-period performance claim can be made until those scripts are run on matured historical snapshots and the reviews above are complete. The deployed model remains unchanged and should be treated as a prototype.
