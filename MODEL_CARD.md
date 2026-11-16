@@ -82,3 +82,21 @@ The evaluation script retrains the documented pipeline using the fixed stratifie
 At threshold 0.275, subgroup recall on this holdout was 95.80% for Female accounts and 99.13% for Male accounts. Marital_Status subgroup recall ranged from 91.30% to 99.49%. Small groups and differing observed churn rates require careful interpretation. The ablation excluding Gender and Marital_Status reduced Average Precision to 0.9763 and ROC-AUC to 0.9946 on this same split; this performance change alone does not justify retaining demographic attributes. Review necessity, lawfulness, fairness, and alternatives with appropriate stakeholders.
 
 The Brier score is better than a constant-prevalence baseline on this random holdout, but this does not certify probability calibration. Continue to present the output as a risk score. Temporal validation remains blocked until dated, point-in-time data and an explicit prediction horizon are available.
+
+## Stage 4C: duplicate and ordering sensitivity audit
+
+A supplementary audit was run against the supplied workbook. It found 264 groups of repeated feature vectors (528 rows in total); each repeated feature group had the same observed target. In the original random split, 94 test rows had an identical feature vector represented in the training partition.
+
+A five-fold stratified group split, grouping identical feature vectors so they cannot cross partitions, produced Average Precision 0.9795, ROC-AUC 0.9934 and Brier score 0.0183. At threshold 0.275, precision was 87.35% and recall was 94.72% (TN=1,821, FP=52, FN=20, TP=359). This is a sensitivity check for exact duplicate feature rows, not a substitute for external or temporal validation.
+
+AccountID is unique and monotonically increasing in the workbook, but it is not documented as a timestamp. Its Pearson correlation with the target is -0.0095. An ID-ordered split (first 80% of IDs for training, final 20% for testing) produced Average Precision 0.9568 and ROC-AUC 0.9908. Reversing train/test direction produced Average Precision 0.8122 and ROC-AUC 0.9384. These are ordering stress tests only: they must not be interpreted as temporal validation, evidence of drift, or proof that AccountID encodes time.
+
+No definitive target-leakage feature was established by this audit. Feature-target association and high predictive performance are not, by themselves, proof of leakage. The source's provenance, field definitions, observation windows, and target construction still require verification. In particular, confirm that complaint, contact, tenure, revenue, coupon and cashback fields were all measured strictly before the churn outcome and within the intended prediction window.
+
+Run the additional audit locally:
+
+```bash
+python audit_data.py --data "Customer Churn Data.xlsx" --output artifacts/data_audit_report.json
+```
+
+The script writes aggregated statistics only. It does not write account-level data or the source workbook.
