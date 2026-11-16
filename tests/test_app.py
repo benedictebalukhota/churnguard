@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app import DEFAULT_THRESHOLD, FEATURE_COLUMNS, build_account_frame, predict_account
+from app import DEFAULT_THRESHOLD, FEATURE_COLUMNS, build_account_frame, explain_account, predict_account
 
 
 def sample_payload():
@@ -50,3 +50,11 @@ def test_threshold_changes_only_the_decision():
     assert math.isclose(low_threshold["risk_score"], high_threshold["risk_score"], rel_tol=0, abs_tol=1e-12)
     assert low_threshold["flagged_for_retention"] is True
     assert high_threshold["flagged_for_retention"] is False
+
+
+
+def test_shap_explanation_returns_ranked_feature_table():
+    explanation = explain_account(sample_payload(), top_n=5)
+    assert "Why the model produced this score" in explanation
+    assert "| Input feature | Account value | Contribution | Direction |" in explanation
+    assert "not causal explanations" in explanation.lower()
