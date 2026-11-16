@@ -10,7 +10,7 @@
   },
   "risk_score": "predict_proba[:, 1], bounded from 0.0 to 1.0; treat as a ranking score until separately calibrated",
   "default_threshold": 0.275,
-  "threshold_source": "Milestone 2 training out-of-fold F2 optimization",
+  "threshold_source": "Milestone 2 training out-of-fold F2 optimization (recorded project setting)",
   "feature_columns": [
     "Tenure",
     "City_Tier",
@@ -68,11 +68,47 @@
     "colsample_bytree": 1.0
   },
   "training_split": "Stratified 80/20; random_state=42; model fitted on training partition only",
-  "milestone_2_reference_metrics": {
-    "cross_validation_average_precision_mean": 0.9718,
-    "cross_validation_average_precision_std": 0.0091,
-    "holdout_average_precision": 0.9869,
-    "holdout_roc_auc": 0.997
+  "reproduction_metrics": {
+    "train_accounts": 9008,
+    "test_accounts": 2252,
+    "test_churn_rate": 0.16829484902309058,
+    "average_precision": 0.9869118362489431,
+    "roc_auc": 0.9970290209292726,
+    "precision_at_0_275": 0.8918269230769231,
+    "recall_at_0_275": 0.978891820580475,
+    "confusion_matrix_tn_fp_fn_tp": [
+      1828,
+      45,
+      8,
+      371
+    ]
+  },
+  "data_audit": {
+    "source_sheet": "Data for DSBA",
+    "records": 11260,
+    "columns": 19,
+    "unique_account_ids": true,
+    "duplicate_rows": 0,
+    "churn_counts": {
+      "0": 9364,
+      "1": 1896
+    },
+    "placeholder_tokens": [
+      "#",
+      "@",
+      "+",
+      "$",
+      "*",
+      "&&&&"
+    ]
+  },
+  "versions": {
+    "python": "3.13.5",
+    "pandas": "2.2.3",
+    "numpy": "2.3.5",
+    "scikit_learn": "1.8.0",
+    "lightgbm": "4.6.0",
+    "joblib": "1.5.3"
   },
   "limitations": [
     "The workbook has no extraction timestamp or explicit churn prediction horizon.",
