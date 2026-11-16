@@ -39,7 +39,7 @@ def load_table(path: Path) -> pd.DataFrame:
     raise ValueError("Input must be a CSV or Excel workbook.")
 
 
-def validate(data_path: Path, horizon_days: int, provenance_path: Path | None):
+def validate(data_path: Path, horizon_days: int = 30, provenance_path: Path | None = None):
     if horizon_days <= 0:
         raise ValueError("--horizon-days must be a positive integer.")
     df = load_table(data_path)
