@@ -188,7 +188,12 @@ def explain_account(payload: dict[str, Any], top_n: int = 5) -> str:
         elif name.startswith("numeric__"):
             source_name = name.removeprefix("numeric__")
         elif name.startswith("categorical__"):
-            source_name = name.removeprefix("categorical__").split("_", 1)[0]
+            encoded_name = name.removeprefix("categorical__")
+            source_name = next(
+                (column for column in sorted(CATEGORICAL_COLUMNS, key=len, reverse=True)
+                 if encoded_name == column or encoded_name.startswith(column + "_")),
+                encoded_name,
+            )
         else:
             source_name = name
         grouped[source_name] = grouped.get(source_name, 0.0) + float(contribution)
