@@ -72,6 +72,8 @@ Confirm each field's definition, unit, observation window, missing-value meaning
 8. Compare against simple baselines and existing random/group-aware holdouts.
 9. Preserve a frozen future test period for final reporting.
 
+The implementation is `evaluate_temporal.py`. It takes `--train-cutoff`, `--test-start`, `--test-end`, and `--evaluation-as-of` dates. It selects the latest matured training snapshot and earliest matured test snapshot per account. `--account-scope unseen` excludes accounts present in training; `--account-scope returning` evaluates only accounts represented in both periods. The two modes answer different questions and should be reported separately.
+
 ## Privacy and handling
 
 Keep raw account-level data in an approved restricted environment. Do not commit raw datasets, identifiers, or feature-level provenance records to GitHub. Only publish aggregated metrics after privacy review.
