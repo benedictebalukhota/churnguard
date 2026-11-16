@@ -5,9 +5,8 @@ labels have complete follow-up, snapshots are not duplicated, and a separate
 feature-provenance CSV has no feature timestamps after each snapshot.
 
 Example:
-  python validate_temporal_data.py --data snapshots.csv --horizon-days 60
-  python validate_temporal_data.py --data snapshots.xlsx --horizon-days 60 \
-      --provenance feature_provenance.csv
+  python validate_temporal_data.py --data snapshots.csv
+  python validate_temporal_data.py --data snapshots.xlsx --provenance feature_provenance.csv
 
 Expected columns:
   AccountID, Snapshot_Date, Outcome_Observed_Through, Churn_Date, Churn,
@@ -68,7 +67,12 @@ def validate(data_path: Path, horizon_days: int, provenance_path: Path | None):
 
     valid_dates = df["Snapshot_Date"].notna() & df["Outcome_Observed_Through"].notna()
     expected_end = df["Snapshot_Date"] + pd.to_timedelta(horizon_days, unit="D")
-    incomplete = valid_dates & (df["Outcome_Observed_Through"] < expected_end)
+    # Negative labels require full 30-day follow-up. Positive labels only require
+    # observation through the actual churn date, within the prediction horizon.
+    incomplete = (
+        valid_dates & (churn_label == 0) &
+        (df["Outcome_Observed_Through"] < expected_end)
+    )
     if incomplete.any():
         errors.append(
             f"{int(incomplete.sum())} rows lack full {horizon_days}-day outcome follow-up; "
@@ -232,7 +236,10 @@ def validate(data_path: Path, horizon_days: int, provenance_path: Path | None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", required=True, help="Dated CSV or Excel snapshot table")
-    parser.add_argument("--horizon-days", required=True, type=int)
+    parser.add_argument(
+        "--horizon-days", type=int, default=30,
+        help="Prediction horizon in days (default: proposed 30-day horizon)",
+    )
     parser.add_argument("--provenance", default=None, help="Optional feature-provenance CSV")
     parser.add_argument("--output", default="artifacts/temporal_data_validation.json")
     args = parser.parse_args()
