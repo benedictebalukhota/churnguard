@@ -135,6 +135,20 @@ python validate_temporal_data.py --data snapshots.csv --provenance feature_prove
 
 The validator defaults to 30 days. Override with `--horizon-days` only if the business later approves a different horizon. It does not train a model or prove that churn definitions and source timestamps are correct.
 
+After the structural checks pass and the test outcome window has matured, run the chronological evaluation. Example dates below are placeholders and must be replaced with real cutoffs:
+
+```bash
+python evaluate_temporal.py \\
+  --data snapshots.csv \\
+  --train-cutoff 2025-06-30 \\
+  --test-start 2025-07-01 \\
+  --test-end 2025-09-30 \\
+  --evaluation-as-of 2025-10-30 \\
+  --account-scope unseen
+```
+
+The script uses the latest matured training snapshot per account and the earliest matured test snapshot per account. `unseen` evaluates accounts absent from training; use `--account-scope returning` for a separate evaluation of accounts represented in both periods. It requires both classes in each partition and reports aggregate metrics only. The legacy 0.275 threshold is shown as a fixed benchmark, not a validated operational threshold. Never tune the threshold on the final test period.
+
 See `docs/PRODUCTION_MONITORING_PLAN.md` for the controlled-pilot gates. The current source workbook still cannot support temporal validation because it has no snapshot dates or feature observation timestamps.
 
 ## Model summary
