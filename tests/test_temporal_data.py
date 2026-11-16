@@ -65,4 +65,4 @@ def test_censored_negative_label_is_blocked(tmp_path):
 def test_default_horizon_is_30_days():
     import inspect
     from validate_temporal_data import validate
-    assert inspect.signature(validate).parameters['horizon_days'].default == inspect.Parameter.empty
+    assert inspect.signature(validate).parameters['horizon_days'].default == 30
