@@ -86,6 +86,12 @@ churnguard/
 ├── app.py
 ├── train_model.py
 ├── evaluate_model.py
+├── evaluate_temporal.py
+├── audit_data.py
+├── validate_temporal_data.py
+├── docs/
+│   ├── TEMPORAL_DATA_CONTRACT.md
+│   └── PRODUCTION_MONITORING_PLAN.md
 ├── client_example.py
 ├── requirements.txt
 ├── requirements-train.txt
