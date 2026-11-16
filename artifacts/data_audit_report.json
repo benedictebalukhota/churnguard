@@ -1,0 +1,137 @@
+{
+  "audit_version": "1.0.0",
+  "source": {
+    "rows": 11260,
+    "account_id_unique": true,
+    "account_id_monotonic_increasing": true,
+    "account_id_target_pearson": -0.009541386555324643,
+    "account_id_target_spearman": -0.009541386555324653,
+    "account_id_quantile_churn_rates": [
+      {
+        "bin": "(19999.999, 21125.9]",
+        "count": 1126,
+        "churn_rate": 0.1820603908
+      },
+      {
+        "bin": "(21125.9, 22251.8]",
+        "count": 1126,
+        "churn_rate": 0.161634103
+      },
+      {
+        "bin": "(22251.8, 23377.7]",
+        "count": 1126,
+        "churn_rate": 0.1722912966
+      },
+      {
+        "bin": "(23377.7, 24503.6]",
+        "count": 1126,
+        "churn_rate": 0.161634103
+      },
+      {
+        "bin": "(24503.6, 25629.5]",
+        "count": 1126,
+        "churn_rate": 0.1642984014
+      },
+      {
+        "bin": "(25629.5, 26755.4]",
+        "count": 1126,
+        "churn_rate": 0.1820603908
+      },
+      {
+        "bin": "(26755.4, 27881.3]",
+        "count": 1126,
+        "churn_rate": 0.161634103
+      },
+      {
+        "bin": "(27881.3, 29007.2]",
+        "count": 1126,
+        "churn_rate": 0.1722912966
+      },
+      {
+        "bin": "(29007.2, 30133.1]",
+        "count": 1126,
+        "churn_rate": 0.161634103
+      },
+      {
+        "bin": "(30133.1, 31259.0]",
+        "count": 1126,
+        "churn_rate": 0.1642984014
+      }
+    ]
+  },
+  "duplicate_feature_audit": {
+    "duplicate_feature_groups": 264,
+    "rows_in_duplicate_groups": 528,
+    "largest_group_size": 2,
+    "conflicting_target_groups": 0,
+    "random_split_duplicate_hashes_crossing_partitions": 94,
+    "random_split_test_rows_with_training_duplicate": 94,
+    "interpretation": "Exact repeated feature vectors can make a random holdout optimistic. Group-aware evaluation keeps them in one partition."
+  },
+  "group_aware_holdout": {
+    "n": 2252,
+    "churn_rate": 0.168294849,
+    "average_precision": 0.9794632944,
+    "roc_auc": 0.9934297552,
+    "brier_score": 0.0183314188,
+    "threshold": 0.275,
+    "tn": 1821,
+    "fp": 52,
+    "fn": 20,
+    "tp": 359,
+    "precision": 0.8734793187,
+    "recall": 0.9472295515
+  },
+  "accountid_order_sensitivity_only": {
+    "first_80_percent_ids_train_last_20_percent_ids_test": {
+      "n": 2252,
+      "churn_rate": 0.1629662522,
+      "average_precision": 0.9567935968,
+      "roc_auc": 0.9908137526,
+      "brier_score": 0.029097891,
+      "threshold": 0.275,
+      "tn": 1782,
+      "fp": 103,
+      "fn": 10,
+      "tp": 357,
+      "precision": 0.7760869565,
+      "recall": 0.9727520436
+    },
+    "last_20_percent_ids_train_first_80_percent_ids_test": {
+      "n": 9008,
+      "churn_rate": 0.1697380107,
+      "average_precision": 0.8122443331,
+      "roc_auc": 0.9383554091,
+      "brier_score": 0.0658683781,
+      "threshold": 0.275,
+      "tn": 6935,
+      "fp": 544,
+      "fn": 315,
+      "tp": 1214,
+      "precision": 0.6905574516,
+      "recall": 0.7939829954
+    },
+    "warning": "AccountID is not a timestamp. These results are ordering stress tests, not temporal validation or evidence of drift."
+  },
+  "numeric_feature_target_pearson": {
+    "Complain_l12m": 0.2514876415,
+    "Tenure": -0.2331502634,
+    "Day_Since_CC_connect": -0.1479563917,
+    "Account_user_count": 0.1072916666,
+    "CC_Agent_Score": 0.1057963599,
+    "City_Tier": 0.0841352723,
+    "CC_Contacted_L12m": 0.0720714979,
+    "cashback_l12m": -0.0323822124,
+    "rev_per_month": 0.0225379705,
+    "coupon_used_l12m": -0.0148260745,
+    "rev_growth_yoy": -0.0138765998,
+    "Service_Score": 0.0089909132
+  },
+  "limitations": [
+    "No extraction date, observation timestamp, or churn prediction horizon is available.",
+    "Feature association does not establish target leakage or causality.",
+    "The dataset provenance and feature-generation process require confirmation.",
+    "Group-aware holdout addresses exact duplicate feature vectors only, not near-duplicates or temporal leakage.",
+    "A future-dated, point-in-time dataset is required for temporal validation."
+  ]
+}
