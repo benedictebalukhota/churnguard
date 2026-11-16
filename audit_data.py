@@ -117,7 +117,7 @@ def audit(data_path: Path, output_path: Path):
     id_bin_rates = (
         pd.DataFrame({"id_bin": id_bins.astype(str), "churn": y})
         .groupby("id_bin", sort=False)["churn"]
-        .agg(["count", "mean"])
+        .agg(count="count", churn_rate="mean")
         .reset_index()
         .to_dict(orient="records")
     )
@@ -154,6 +154,7 @@ def audit(data_path: Path, output_path: Path):
                 "optimistic. Group-aware evaluation keeps them in one partition."
             ),
         },
+        "random_stratified_holdout": fit_and_score(X, y, train_idx, test_idx),
         "group_aware_holdout": grouped_metrics,
         "accountid_order_sensitivity_only": {
             "first_80_percent_ids_train_last_20_percent_ids_test": id_forward,
