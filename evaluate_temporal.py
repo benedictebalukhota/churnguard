@@ -48,10 +48,10 @@ def evaluate(args):
     required_dates = ["Snapshot_Date", "Outcome_Observed_Through"]
     for col in required_dates:
         raw[col] = pd.to_datetime(raw[col], errors="coerce", utc=True)
-    train_cutoff = pd.Timestamp(args.train_cutoff, tz="UTC")
-    test_start = pd.Timestamp(args.test_start, tz="UTC")
-    test_end = pd.Timestamp(args.test_end, tz="UTC")
-    evaluation_as_of = pd.Timestamp(args.evaluation_as_of, tz="UTC")
+    train_cutoff = pd.to_datetime(args.train_cutoff, utc=True)
+    test_start = pd.to_datetime(args.test_start, utc=True)
+    test_end = pd.to_datetime(args.test_end, utc=True)
+    evaluation_as_of = pd.to_datetime(args.evaluation_as_of, utc=True)
     if not train_cutoff < test_start <= test_end <= evaluation_as_of:
         raise ValueError("Dates must satisfy train-cutoff < test-start <= test-end <= evaluation-as-of.")
     train = raw[(raw["Snapshot_Date"] <= train_cutoff) & (raw["Outcome_Observed_Through"] <= train_cutoff)].copy()
