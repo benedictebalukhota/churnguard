@@ -100,3 +100,10 @@ python audit_data.py --data "Customer Churn Data.xlsx" --output artifacts/data_a
 ```
 
 The script writes aggregated statistics only. It does not write account-level data or the source workbook.
+
+
+## Temporal validation readiness
+
+A temporal-data contract and structural validator are included in `docs/TEMPORAL_DATA_CONTRACT.md` and `validate_temporal_data.py`. The validator checks snapshot dates, full outcome follow-up, churn-label timing, duplicate account snapshots, and optional per-snapshot feature provenance. It does not establish that a business churn definition is correct and does not replace a chronological train/test evaluation.
+
+The current source workbook cannot pass temporal validation because it has no snapshot timestamps, feature observation timestamps, or explicit prediction horizon. The model should remain a prototype / controlled-pilot candidate until those data are available and the gates in `docs/PRODUCTION_MONITORING_PLAN.md` are met.
