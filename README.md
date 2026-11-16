@@ -82,7 +82,9 @@ churnguard/
 │   └── sample_account.json
 ├── tests/
 │   ├── README.md
-│   └── test_app.py
+│   ├── test_app.py
+│   ├── test_temporal_data.py
+│   └── test_temporal_evaluation.py
 ├── app.py
 ├── train_model.py
 ├── evaluate_model.py
