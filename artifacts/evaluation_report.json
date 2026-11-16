@@ -1,0 +1,223 @@
+{
+  "audit_version": "1.0.0",
+  "dataset": {
+    "rows": 11260,
+    "test_rows": 2252,
+    "churn_total": 1896,
+    "nonchurn_total": 9364,
+    "test_churn_rate": 0.168294849
+  },
+  "split": "Stratified 80/20, random_state=42",
+  "overall": {
+    "average_precision": 0.9869118362,
+    "roc_auc": 0.9970290209,
+    "brier_score": 0.0139641194,
+    "prevalence_baseline_brier": 0.1399716928,
+    "log_loss": 0.0519308697
+  },
+  "threshold_0_275": {
+    "tn": 1828,
+    "fp": 45,
+    "fn": 8,
+    "tp": 371,
+    "precision": 0.8918269231,
+    "recall": 0.9788918206,
+    "f1": 0.9333333333,
+    "flagged_accounts": 416,
+    "flagged_rate": 0.1847246892
+  },
+  "threshold_0_5": {
+    "tn": 1848,
+    "fp": 25,
+    "fn": 16,
+    "tp": 363,
+    "precision": 0.9355670103,
+    "recall": 0.9577836412,
+    "f1": 0.9465449804,
+    "flagged_accounts": 388,
+    "flagged_rate": 0.1722912966
+  },
+  "threshold_sweep": {
+    "0.10": {
+      "precision": 0.789,
+      "recall": 0.9868,
+      "f1": 0.8769,
+      "flagged": 474
+    },
+    "0.15": {
+      "precision": 0.8184,
+      "recall": 0.9868,
+      "f1": 0.8947,
+      "flagged": 457
+    },
+    "0.20": {
+      "precision": 0.8614,
+      "recall": 0.9842,
+      "f1": 0.9187,
+      "flagged": 433
+    },
+    "0.25": {
+      "precision": 0.89,
+      "recall": 0.9815,
+      "f1": 0.9335,
+      "flagged": 418
+    },
+    "0.275": {
+      "precision": 0.8918,
+      "recall": 0.9789,
+      "f1": 0.9333,
+      "flagged": 416
+    },
+    "0.30": {
+      "precision": 0.8935,
+      "recall": 0.9736,
+      "f1": 0.9318,
+      "flagged": 413
+    },
+    "0.35": {
+      "precision": 0.9156,
+      "recall": 0.9736,
+      "f1": 0.9437,
+      "flagged": 403
+    },
+    "0.40": {
+      "precision": 0.9175,
+      "recall": 0.9683,
+      "f1": 0.9422,
+      "flagged": 400
+    },
+    "0.50": {
+      "precision": 0.9356,
+      "recall": 0.9578,
+      "f1": 0.9465,
+      "flagged": 388
+    },
+    "0.60": {
+      "precision": 0.9517,
+      "recall": 0.9367,
+      "f1": 0.9441,
+      "flagged": 373
+    },
+    "0.70": {
+      "precision": 0.9612,
+      "recall": 0.9156,
+      "f1": 0.9378,
+      "flagged": 361
+    },
+    "0.80": {
+      "precision": 0.9826,
+      "recall": 0.8945,
+      "f1": 0.9365,
+      "flagged": 345
+    }
+  },
+  "calibration": {
+    "strategy": "10 quantile bins",
+    "mean_predicted_score": [
+      0.000007828,
+      0.000041208,
+      0.000127865,
+      0.000347766,
+      0.000923544,
+      0.002481647,
+      0.008540258,
+      0.053214099,
+      0.702412753,
+      0.995649233
+    ],
+    "observed_churn_rate": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0.022222222,
+      0.662222222,
+      0.995575221
+    ],
+    "interpretation": "Descriptive only; score is not certified as an individual probability."
+  },
+  "subgroup_metrics": {
+    "Gender": {
+      "Female": {
+        "n": 871,
+        "precision": 0.8782,
+        "recall": 0.958,
+        "false_positive_rate": 0.0261,
+        "flagged_rate": 0.1791
+      },
+      "Male": {
+        "n": 1357,
+        "precision": 0.9048,
+        "recall": 0.9913,
+        "false_positive_rate": 0.0213,
+        "flagged_rate": 0.1857
+      },
+      "Missing": {
+        "n": 24,
+        "precision": 0.75,
+        "recall": 1,
+        "false_positive_rate": 0.1111,
+        "flagged_rate": 0.3333
+      }
+    },
+    "Marital_Status": {
+      "Divorced": {
+        "n": 334,
+        "precision": 0.913,
+        "recall": 0.913,
+        "false_positive_rate": 0.0139,
+        "flagged_rate": 0.1377
+      },
+      "Married": {
+        "n": 1156,
+        "precision": 0.8699,
+        "recall": 0.9769,
+        "false_positive_rate": 0.0185,
+        "flagged_rate": 0.1263
+      },
+      "Missing": {
+        "n": 40,
+        "precision": 1,
+        "recall": 1,
+        "false_positive_rate": 0,
+        "flagged_rate": 0.175
+      },
+      "Single": {
+        "n": 722,
+        "precision": 0.8986,
+        "recall": 0.9949,
+        "false_positive_rate": 0.0418,
+        "flagged_rate": 0.3006
+      }
+    }
+  },
+  "sensitive_feature_ablation": {
+    "excluded_features": [
+      "Gender",
+      "Marital_Status"
+    ],
+    "average_precision": 0.9763267099,
+    "roc_auc": 0.9945595443,
+    "threshold_0_275": {
+      "tn": 1802,
+      "fp": 71,
+      "fn": 17,
+      "tp": 362,
+      "precision": 0.836,
+      "recall": 0.9551,
+      "f1": 0.8916,
+      "flagged": 433
+    },
+    "interpretation": "Single-split diagnostic; performance loss alone does not justify retaining demographic features."
+  },
+  "limitations": [
+    "Random holdout only; not future-period validation.",
+    "No extraction timestamp, explicit churn horizon, or feature availability timestamps.",
+    "Probability calibration is not certified.",
+    "Subgroup metrics are descriptive and not a fairness certification.",
+    "No intervention costs or outcome data."
+  ]
+}
