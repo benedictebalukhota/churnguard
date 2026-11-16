@@ -147,3 +147,13 @@ Each public Gradio Space exposes its available API methods through the **Use via
 - ChurnGuard Capstone Milestone 2 Business Report (8 November 2026)
 - Hugging Face Spaces Gradio SDK documentation: https://huggingface.co/docs/hub/spaces-sdks-gradio
 - Hugging Face Spaces configuration: https://huggingface.co/docs/hub/main/en/spaces-config-reference
+
+
+## Prediction explanations
+
+The Gradio interface includes local SHAP explanations for each account prediction. ChurnGuard uses the fitted LightGBM model's TreeSHAP contributions and groups one-hot encoded categories back to their original input fields.
+
+- Positive SHAP contributions push the model's raw output toward the positive class (Churn = 1).
+- Negative contributions push it away from the positive class.
+- Contributions are in raw-margin (log-odds) units, not percentage points.
+- SHAP values describe model behaviour for this input; they do not establish causality.
