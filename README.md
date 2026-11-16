@@ -55,11 +55,12 @@ Before enabling the workflow:
 
 1. Create a Gradio Space.
 2. Add the GitHub Actions repository secret `HF_TOKEN` with a Hugging Face write token scoped to that Space.
-3. Add the GitHub Actions repository variable `HF_REPO_ID` with the exact Hugging Face repository ID, for example `your-hf-username/churnguard`.
-4. Upload the fitted `artifacts/churnguard_pipeline.joblib` file to this GitHub repository.
-5. Push to `main`; GitHub Actions will mirror the files to the Space and Hugging Face will rebuild it.
+3. Confirm the GitHub Actions repository secret `HF_TOKEN` contains a Hugging Face write token for the target Space.
+4. The current workflow targets `benedictebalukhota/churnguard` directly in `.github/workflows/sync-to-huggingface.yml`. Update that value if your Space has a different ID.
+5. Confirm `artifacts/churnguard_pipeline.joblib` is present in this repository.
+6. Push to `main`; GitHub Actions will mirror the files to the Space and Hugging Face will rebuild it.
 
-The workflow intentionally skips deployment while the fitted model file is absent. See `DEPLOYMENT.md` for the full steps.
+The current workflow attempts to sync on every push to `main` and on manual dispatch. See `DEPLOYMENT.md` for the full steps.
 
 For a one-time/manual deployment, create a Gradio Space and push or upload the complete repository contents after the model file has been added. The Space reads its SDK, Python and app entry-point settings from the YAML block at the top of this README.
 
