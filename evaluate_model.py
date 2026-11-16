@@ -23,7 +23,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 
 from train_model import (
-    DEFAULT_THRESHOLD, FEATURE_COLUMNS, ID_COL, NUMERIC_COLUMNS,
+    DEFAULT_THRESHOLD, FEATURE_COLUMNS, CATEGORICAL_COLUMNS,
     TARGET, build_pipeline, clean_source,
 )
 
