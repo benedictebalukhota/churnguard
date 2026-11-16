@@ -93,10 +93,15 @@ def validate(data_path: Path, horizon_days: int, provenance_path: Path | None):
     negative_invalid = (churn_label == 0) & (
         churn_date.notna() & (churn_date <= horizon_end)
     )
+    positive_not_observed = (
+        (churn_label == 1) & churn_date.notna() &
+        (df["Outcome_Observed_Through"] < churn_date)
+    )
+    positive_invalid = positive_invalid | positive_not_observed
     if positive_invalid.any():
         errors.append(
             f"{int(positive_invalid.sum())} positive labels do not have a churn date "
-            "inside the declared post-snapshot horizon."
+            "inside the declared post-snapshot horizon with follow-up through that date."
         )
     if negative_invalid.any():
         errors.append(
@@ -159,11 +164,33 @@ def validate(data_path: Path, horizon_days: int, provenance_path: Path | None):
                 absent = sorted(expected - covered)
                 if absent:
                     errors.append(f"No provenance entries supplied for features: {absent}")
+                snapshot_keys = set(
+                    zip(df[ID_COL].astype(str), df["Snapshot_Date"].astype(str))
+                )
+                provenance_keys = set(
+                    zip(provenance[ID_COL].astype(str), provenance["Snapshot_Date"].astype(str))
+                )
+                missing_snapshot_keys = snapshot_keys - provenance_keys
+                if missing_snapshot_keys:
+                    errors.append(
+                        f"Provenance is missing for {len(missing_snapshot_keys)} account snapshots."
+                    )
+                per_snapshot_coverage = provenance.groupby(
+                    [provenance[ID_COL].astype(str), provenance["Snapshot_Date"].astype(str)]
+                )["Feature"].nunique()
+                incomplete_snapshots = int((per_snapshot_coverage < len(expected)).sum())
+                if incomplete_snapshots:
+                    errors.append(
+                        f"{incomplete_snapshots} account snapshots do not have provenance "
+                        "for all 17 model features."
+                    )
                 provenance_summary.update({
                     "rows": int(len(provenance)),
                     "features_covered": len(covered),
                     "features_expected": len(expected),
                     "future_feature_timestamp_rows": int(future_features.sum()),
+                    "account_snapshots_with_incomplete_feature_lineage": incomplete_snapshots,
+                    "account_snapshots_missing_lineage": len(missing_snapshot_keys),
                 })
     else:
         warnings.append(
