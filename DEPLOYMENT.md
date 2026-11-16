@@ -7,9 +7,9 @@ This repository uses GitHub as the source of truth and Hugging Face Spaces to ho
 
 ## Current setup status
 
-The repository contains the app code, training script, model metadata, sample input, tests and GitHub Actions workflows.
+The repository contains the app code, training script, fitted model artifact, model metadata, sample input, tests and GitHub Actions workflows.
 
-**The fitted model binary is still missing:** `artifacts/churnguard_pipeline.joblib`. The Gradio app loads this file at startup, so the app cannot run locally or on Hugging Face until the matching Milestone 2 artifact is uploaded to this path.
+The fitted model is present at `artifacts/churnguard_pipeline.joblib`. The application checks workflow has passed. The Hugging Face sync workflow has not yet completed successfully; its latest failure reported invalid Hugging Face README metadata (`colorTo: teal`). The allowed metadata color values include `blue`, so the root README metadata has been corrected.
 
 The raw `Customer Churn Data.xlsx` workbook is intentionally excluded. Do not commit raw customer-level data to a public repository.
 
@@ -67,7 +67,7 @@ Create:
 |---|---|
 | `HF_REPO_ID` | Your exact Space ID, for example `your-hf-username/churnguard` |
 
-The workflow uses `vars.HF_REPO_ID` and `secrets.HF_TOKEN`. It does not require editing the YAML to hard-code a username or token.
+The current workflow uses `secrets.HF_TOKEN` and the Hugging Face repository ID is configured directly in the workflow YAML. Never hard-code your token in the YAML or commit it to the repository.
 
 ### Run and verify the deployment
 
@@ -78,7 +78,7 @@ The workflow uses `vars.HF_REPO_ID` and `secrets.HF_TOKEN`. It does not require 
 5. Open the Space's **Build logs** and then its **App** tab.
 6. Test an example account and check **Use via API**.
 
-The deployment workflow intentionally skips the sync if the model artifact is absent, so an incomplete Space is not published as a successful app.
+The current workflow does not contain a model-artifact skip check. It attempts to sync the repository on each push to `main` or manual run. The Hugging Face Space then builds the app from the synced files.
 
 ## 3. What happens after setup
 
