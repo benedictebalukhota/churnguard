@@ -67,7 +67,9 @@ def validate(data_path: Path, horizon_days: int, provenance_path: Path | None):
 
     valid_dates = df["Snapshot_Date"].notna() & df["Outcome_Observed_Through"].notna()
     expected_end = df["Snapshot_Date"] + pd.to_timedelta(horizon_days, unit="D")
-    # Negative labels require full 30-day follow-up. Positive labels only require
+    churn_date = df["Churn_Date"]
+    churn_label = pd.to_numeric(df[TARGET], errors="coerce")
+    # Negative labels require full horizon follow-up. Positive labels only require
     # observation through the actual churn date, within the prediction horizon.
     incomplete = (
         valid_dates & (churn_label == 0) &
@@ -88,8 +90,6 @@ def validate(data_path: Path, horizon_days: int, provenance_path: Path | None):
         )
 
     horizon_end = expected_end
-    churn_date = df["Churn_Date"]
-    churn_label = pd.to_numeric(df[TARGET], errors="coerce")
     positive_invalid = (churn_label == 1) & (
         churn_date.isna() | (churn_date > horizon_end) |
         (churn_date <= df["Snapshot_Date"])
