@@ -1,14 +1,23 @@
+
 # Model artifacts
 
-This folder stores the fitted preprocessing + LightGBM pipeline and its metadata.
+This folder contains the fitted machine-learning pipeline and its metadata.
 
-Expected runtime artifact:
+## Files
 
-- `churnguard_pipeline.joblib` — fitted model used by `app.py`.
-- `metadata.json` — model version, expected input fields, operating threshold and evaluation notes.
+- `churnguard_pipeline.joblib` — fitted preprocessing and LightGBM model used by `app.py`.
+- `metadata.json` — model version, expected input fields, training configuration, evaluation notes and limitations.
 
-**Important:** the fitted `.joblib` binary is not yet present in this GitHub repository. The application cannot start until the matching file is added at exactly:
+## Model status
+
+The fitted model artifact has been uploaded to this repository at:
 
 `artifacts/churnguard_pipeline.joblib`
 
-Use the artifact generated with the supplied Milestone 2 training process. Do not substitute a newly trained model without reviewing its evaluation metrics. Do not upload the source Excel workbook or customer-level training rows to a public repository.
+The application loads this file during startup. Keep the model and metadata consistent when updating or retraining the model.
+
+## Important
+
+- Do not upload the original customer dataset or confidential customer-level records.
+- Do not replace the model artifact without reviewing the new training and evaluation results.
+- Keep the model input schema consistent with `app.py`.
