@@ -57,4 +57,4 @@ def test_shap_explanation_returns_ranked_feature_table():
     explanation = explain_account(sample_payload(), top_n=5)
     assert "Why the model produced this score" in explanation
     assert "| Input feature | Account value | Contribution | Direction |" in explanation
-    assert "not causal explanations" in explanation.lower()
+    assert "do not establish cause" in explanation.lower()
