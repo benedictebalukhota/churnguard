@@ -54,3 +54,8 @@ ChurnGuard is an account-level binary classifier intended to help an e-commerce 
 - Choose thresholds using business capacity, costs and contribution margin.
 - Compare retention outcomes against a holdout group.
 - Review subgroup error rates, fairness, privacy, monitoring and access controls.
+
+
+## Explainability
+
+The application displays local SHAP (TreeSHAP) contributions for individual predictions. Contributions from one-hot encoded categorical fields and numeric preprocessing fields are grouped to their original source features. Positive contributions move the model's raw margin toward Churn = 1; negative contributions move it away. Values are expressed in raw-margin (log-odds) units, not percentage points, and must not be interpreted as causal effects.
