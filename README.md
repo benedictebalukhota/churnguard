@@ -18,7 +18,7 @@ ChurnGuard is a Gradio application that scores an e-commerce account for churn r
 **Output:** a model risk score between `0.0` and `1.0`, plus an alert based on a configurable threshold.  
 **Default alert threshold:** `0.275`, selected by maximizing F2 on training out-of-fold predictions in Milestone 2.
 
-> **Repository setup status:** the source code, fitted model artifact, metadata, tests, examples and deployment workflow are present. GitHub Actions application checks have passed. Hugging Face deployment is still being verified.
+> **Deployment status:** the application is deployed on Hugging Face Spaces; GitHub Actions checks have passed and live predictions have been verified.
 
 > **Important interpretation:** the displayed score is the model's positive-class score and is useful for ranking accounts. It is not guaranteed to be a calibrated individual churn probability. The source dataset has no extraction timestamp or explicit prediction horizon; point-in-time leakage has not been ruled out. Treat this as a prototype / controlled-pilot tool, not a production decision system.
 
@@ -85,6 +85,7 @@ churnguard/
 │   └── test_app.py
 ├── app.py
 ├── train_model.py
+├── evaluate_model.py
 ├── client_example.py
 ├── requirements.txt
 ├── requirements-train.txt
@@ -104,6 +105,19 @@ python train_model.py --data "Customer Churn Data.xlsx" --output artifacts
 ```
 
 Review the new metadata and evaluation results before replacing the saved model. The script writes `artifacts/churnguard_pipeline.joblib` and `artifacts/metadata.json`. Upload only the fitted model artifact and metadata; do not upload the raw Excel workbook or customer-level records.
+
+## Reproduce the evaluation
+
+With the authorized source workbook available locally, run:
+
+```bash
+pip install -r requirements-train.txt
+python evaluate_model.py --data "Customer Churn Data.xlsx" --output artifacts/evaluation_report.json
+```
+
+The script recreates the fixed stratified holdout, threshold sweep, calibration bins, subgroup metrics, and sensitive-feature ablation. It writes only aggregated evaluation results; never commit the source workbook or account-level records.
+
+The reproduced holdout at threshold 0.275 yielded precision 89.18%, recall 97.89%, and F1 93.33% (TN=1,828, FP=45, FN=8, TP=371). This is a random holdout, not future-period validation. Gender and Marital_Status subgroup results are documented in MODEL_CARD.md and should be treated as descriptive diagnostics, not proof of fairness. The score remains a ranking signal, not a calibrated individual probability.
 
 ## Model summary
 
