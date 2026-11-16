@@ -1,8 +1,10 @@
 # ChurnGuard temporal-data contract
 
-## Purpose
+## Proposed prediction horizon
 
-This contract defines the minimum evidence required before a future-period evaluation. The current workbook has no snapshot date, feature observation timestamps, or explicit prediction horizon, so it cannot support temporal validation.
+**The proposed ChurnGuard prediction horizon is 30 days.** This is a validation-design choice, not a claim that the current model has been trained or validated for 30-day churn. Confirm the operational definition of churn with the data and business owners before labels are generated.
+
+For a snapshot at time T, the label is 1 when churn occurs strictly after T and on or before T + 30 days. A label of 0 is valid only when the account is observed through at least T + 30 days with no churn in that interval. A positive row needs outcome observation through its actual churn date. Rows without sufficient follow-up are censored/excluded, never silently labelled 0.
 
 ## Required account-snapshot table
 
@@ -10,16 +12,16 @@ One row represents one account at one prediction snapshot. Required columns:
 
 | Column | Requirement |
 |---|---|
-| AccountID | Stable account identifier; not a timestamp or model feature |
+| AccountID | Stable account identifier; not a model feature |
 | Snapshot_Date | Timestamp when the prediction would have been made |
-| Outcome_Observed_Through | Date through which churn status is known; must be at least Snapshot_Date + horizon |
-| Churn_Date | Actual churn date, blank only when no churn occurred in the fully observed horizon |
-| Churn | Binary target derived using the agreed horizon definition |
+| Outcome_Observed_Through | For churned rows, at least Churn_Date; for non-churn rows, at least Snapshot_Date + 30 days |
+| Churn_Date | Actual churn date; blank for accounts with no churn in the fully observed 30-day horizon |
+| Churn | Binary target derived using the 30-day rule above |
 | All 17 model features | Values available at Snapshot_Date, never values recorded afterwards |
 
-## Define the prediction horizon before collecting labels
+## Define churn operationally
 
-Choose and document a business-approved horizon (for example, 30, 60, or 90 days). Do not treat this example as a decision already made. Define churn operationally, including cancellations, inactivity rules, reactivations, and exclusions. For a horizon H, a positive label means churn occurred after the snapshot and on or before Snapshot_Date + H. A negative label requires evidence that the account was observed through the full horizon without churn. Incomplete follow-up must be marked censored or excluded, not silently labelled 0.
+Before building labels, document what counts as churn: cancellation, inactivity rules (if any), reactivation handling, exclusions, and the authoritative source system. Do not assume a cancellation date and an inactivity-based churn date mean the same thing. Resolve timezone and date-boundary conventions.
 
 ## Feature provenance table
 
@@ -34,7 +36,7 @@ Maintain a separate long-format file with one row per account snapshot and featu
 | Source_System | Originating system/table |
 | Transformation_Version | Query, code, or business-rule version |
 
-Every feature's Feature_Observed_At must be less than or equal to Snapshot_Date. Aggregated features must record the end of their observation window, not merely the time the aggregate was computed.
+Every feature's Feature_Observed_At must be less than or equal to Snapshot_Date. Aggregated features must record the end of their observation window, not merely the time the aggregate was computed. For rolling-window fields, document the exact start and end dates.
 
 ## Existing model feature list
 
@@ -61,14 +63,14 @@ Confirm each field's definition, unit, observation window, missing-value meaning
 ## Evaluation protocol
 
 1. Sort snapshots by Snapshot_Date.
-2. Choose a cutoff date before looking at test performance.
-3. Train only on snapshots whose full outcome horizon is known by the training cutoff.
-4. Test on later snapshots whose full outcome horizon is known.
-5. Prevent the same AccountID from crossing train and test if the intended question is performance on unseen accounts. If evaluating repeat snapshots for existing accounts, define that as a separate returning-account test.
-6. Fit imputers, encoders, feature selection, calibration, and threshold selection on training data only.
+2. Choose and freeze a chronological training cutoff before examining test performance.
+3. Train only on snapshots whose 30-day outcome windows are fully known by the training cutoff.
+4. Test on later snapshots whose outcome windows have matured by the evaluation date.
+5. Prevent the same AccountID crossing train/test for an unseen-account evaluation. If evaluating future snapshots of known accounts, report this separately as a returning-account evaluation.
+6. Fit imputers, encoders, feature selection, calibration, and threshold selection on training/validation data only.
 7. Report Average Precision, ROC-AUC, Brier score, log loss, confusion matrix, precision, recall, and subgroup metrics with uncertainty intervals.
-8. Compare against a simple baseline and the existing random/group-aware holdouts.
-9. Preserve a frozen test period for final reporting.
+8. Compare against simple baselines and existing random/group-aware holdouts.
+9. Preserve a frozen future test period for final reporting.
 
 ## Privacy and handling
 
