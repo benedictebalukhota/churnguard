@@ -2,7 +2,7 @@
 title: ChurnGuard – Account Churn Risk
 emoji: 🛡️
 colorFrom: blue
-colorTo: teal
+colorTo: blue
 sdk: gradio
 sdk_version: 6.5.1
 python_version: "3.13"
@@ -18,7 +18,7 @@ ChurnGuard is a Gradio application that scores an e-commerce account for churn r
 **Output:** a model risk score between `0.0` and `1.0`, plus an alert based on a configurable threshold.  
 **Default alert threshold:** `0.275`, selected by maximizing F2 on training out-of-fold predictions in Milestone 2.
 
-> **Repository setup status:** the source code, metadata, tests, examples and deployment workflow are present. The fitted model binary, `artifacts/churnguard_pipeline.joblib`, has **not yet been added** to this repository. The application will not start until that exact file is uploaded into `artifacts/`. See `artifacts/README.md` and `DEPLOYMENT.md`.
+> **Repository setup status:** the source code, fitted model artifact, metadata, tests, examples and deployment workflow are present. GitHub Actions application checks have passed. Hugging Face deployment is still being verified.
 
 > **Important interpretation:** the displayed score is the model's positive-class score and is useful for ranking accounts. It is not guaranteed to be a calibrated individual churn probability. The source dataset has no extraction timestamp or explicit prediction horizon; point-in-time leakage has not been ruled out. Treat this as a prototype / controlled-pilot tool, not a production decision system.
 
@@ -73,7 +73,7 @@ churnguard/
 ├── artifacts/
 │   ├── README.md
 │   ├── metadata.json
-│   └── churnguard_pipeline.joblib   # still needs to be uploaded
+│   └── churnguard_pipeline.joblib   # fitted model artifact
 ├── assets/
 │   └── README.md
 ├── examples/
