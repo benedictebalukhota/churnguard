@@ -10,6 +10,7 @@ import gradio as gr
 import joblib
 import numpy as np
 import pandas as pd
+import shap
 
 ROOT = Path(__file__).resolve().parent
 MODEL_PATH = ROOT / "artifacts" / "churnguard_pipeline.joblib"
@@ -161,6 +162,62 @@ def _result_html(result: dict[str, Any]) -> str:
     """
 
 
+def explain_account(payload: dict[str, Any], top_n: int = 5) -> str:
+    """Explain one prediction with SHAP values from the fitted LightGBM model."""
+    frame = build_account_frame(payload)
+    preprocessor = MODEL.named_steps["preprocess"]
+    classifier = MODEL.named_steps["model"]
+    transformed = preprocessor.transform(frame)
+    explainer = shap.TreeExplainer(classifier, feature_perturbation="tree_path_dependent")
+    raw_values = explainer.shap_values(transformed)
+
+    if isinstance(raw_values, list):
+        values = np.asarray(raw_values[1])[0]
+    else:
+        values = np.asarray(raw_values)
+        if values.ndim == 3:
+            values = values[0, :, 1]
+        else:
+            values = values[0]
+
+    grouped: dict[str, float] = {}
+    for name, contribution in zip(preprocessor.get_feature_names_out(), values):
+        name = str(name)
+        if name.startswith("numeric__missingindicator_"):
+            source_name = name.removeprefix("numeric__missingindicator_")
+        elif name.startswith("numeric__"):
+            source_name = name.removeprefix("numeric__")
+        elif name.startswith("categorical__"):
+            source_name = name.removeprefix("categorical__").split("_", 1)[0]
+        else:
+            source_name = name
+        grouped[source_name] = grouped.get(source_name, 0.0) + float(contribution)
+
+    ranked = sorted(grouped.items(), key=lambda item: abs(item[1]), reverse=True)[:top_n]
+    if not ranked:
+        return "SHAP did not return feature contributions for this account."
+
+    lines = [
+        "**Why the model produced this score**",
+        "",
+        "These are the largest feature contributions for this account. They explain the model output; they do not establish cause or guarantee future churn.",
+        "",
+        "| Input feature | Account value | Contribution | Direction |",
+        "|---|---:|---:|---|",
+    ]
+    for feature, contribution in ranked:
+        value = payload.get(feature)
+        value_text = "Not provided" if value is None else str(value)
+        direction = "Toward Churn=1" if contribution > 0 else "Away from Churn=1"
+        lines.append(f"| {feature} | {value_text} | {contribution:+.4f} | {direction} |")
+
+    lines.extend([
+        "",
+        "Contribution values are in raw-margin (log-odds) space, not percentage points. Correlated features can share attribution; SHAP values are not causal explanations.",
+    ])
+    return "\n".join(lines)
+
+
 def predict_churn(
     tenure, city_tier, cc_contacted_l12m, payment, gender, service_score,
     account_user_count, account_segment, cc_agent_score, marital_status,
@@ -175,15 +232,16 @@ def predict_churn(
     ]))
     try:
         result = predict_account(payload, threshold)
+        explanation = explain_account(payload)
     except Exception as exc:  # Return a useful validation message in the interface.
-        return f"<div style='color:#b42318;padding:12px'>Input error: {str(exc)}</div>", "", {}
+        return f"<div style='color:#b42318;padding:12px'>Input error: {str(exc)}</div>", "", "", {}
 
     summary = (
         f"**{result['prediction']}**\n\n"
         f"**Suggested next step:** {result['suggested_next_step']}\n\n"
         f"**Interpretation:** {result['score_interpretation']}"
     )
-    return _result_html(result), summary, result
+    return _result_html(result), summary, explanation, result
 
 
 def predict_json(payload_text: str, threshold: float):
@@ -252,6 +310,7 @@ with gr.Blocks(title="ChurnGuard | Account Churn Risk") as demo:
             gr.Markdown("#### Prediction")
             result_card = gr.HTML("<div style='padding:28px;border:1px dashed #94a3b8;border-radius:16px;color:#64748b'>Your account risk result will appear here.</div>")
             result_summary = gr.Markdown("Enter the account details and select **Calculate churn risk**.")
+            explanation_output = gr.Markdown("Feature-level explanation will appear after prediction.")
             result_json = gr.JSON(label="Structured result · API output", visible=False)
             gr.Markdown(
                 """
@@ -269,7 +328,7 @@ with gr.Blocks(title="ChurnGuard | Account Churn Risk") as demo:
     predict_button.click(
         predict_churn,
         inputs=predict_inputs,
-        outputs=[result_card, result_summary, result_json],
+        outputs=[result_card, result_summary, explanation_output, result_json],
         api_name="predict_churn",
     )
     gr.Examples(examples=EXAMPLES, inputs=predict_inputs, label="Try sample accounts")
