@@ -119,6 +119,24 @@ The script recreates the fixed stratified holdout, threshold sweep, calibration 
 
 The reproduced holdout at threshold 0.275 yielded precision 89.18%, recall 97.89%, and F1 93.33% (TN=1,828, FP=45, FN=8, TP=371). This is a random holdout, not future-period validation. Gender and Marital_Status subgroup results are documented in MODEL_CARD.md and should be treated as descriptive diagnostics, not proof of fairness. The score remains a ranking signal, not a calibrated individual probability.
 
+## Proposed 30-day temporal validation
+
+ChurnGuard's proposed prediction horizon for the next validation design is **30 days**. This is a target definition for future evaluation, not evidence that the current deployed model predicts 30-day churn.
+
+For each account snapshot, a positive label means churn occurred after the snapshot and within 30 days. A negative label requires complete observation through the full 30-day window without churn. Positive examples must be observed through their churn date; incomplete negative follow-up must be treated as censored/excluded.
+
+Read `docs/TEMPORAL_DATA_CONTRACT.md` before preparing data. The validator expects `AccountID`, `Snapshot_Date`, `Outcome_Observed_Through`, `Churn_Date`, `Churn`, all 17 existing model features, and (ideally) a feature-provenance CSV documenting when each feature was observed.
+
+Run the structural checks locally:
+
+```bash
+python validate_temporal_data.py --data snapshots.csv --provenance feature_provenance.csv
+```
+
+The validator defaults to 30 days. Override with `--horizon-days` only if the business later approves a different horizon. It does not train a model or prove that churn definitions and source timestamps are correct.
+
+See `docs/PRODUCTION_MONITORING_PLAN.md` for the controlled-pilot gates. The current source workbook still cannot support temporal validation because it has no snapshot dates or feature observation timestamps.
+
 ## Model summary
 
 | Item | Value |
